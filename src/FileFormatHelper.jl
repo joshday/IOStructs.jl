@@ -1,6 +1,6 @@
 module FileFormatHelper
 
-export @iodef
+export @iodef, Reserved, Skip
 
 #-----------------------------------------------------------------------------# Field
 # Parse a "field annotation" into parts the @iodef macro needs.  Accepts one of:
@@ -9,9 +9,9 @@ export @iodef
     # name::Type
 struct Field
     fieldname::Symbol
-    fieldtype::Symbol
+    fieldtype::Union{Symbol, Expr}  # MyType, MyType{T}, etc.
     read_expr::Expr
-    write_expr::Union{Symbol, Expr}  # Base.write(obj, write_expr)
+    write_expr::Union{Symbol, Expr}  # Base.write(obj, $write_expr)
 end
 function Base.show(io::IO, ::MIME"text/plain", part::Field)
     c = get(io, :color, false)
@@ -69,6 +69,7 @@ macro iodef(e)
             $(read_expr.(fields)...)
             return $T($(name.(fields)...))
         end
+        Base.read(file::AbstractString, ::Type{$T}) = open(io -> Base.read(io, $T), file)
 
         function Base.write(io::IO, o::$T)
             (; $(name.(fields)...)) = o
@@ -76,6 +77,7 @@ macro iodef(e)
             $(write_expr.(fields)...)
             return n
         end
+        Base.write(file::AbstractString, ::Type{$T}) = open(io -> Base.write(io, $T), file, "w")
     end)
 end
 
@@ -86,5 +88,18 @@ function roundtrip(x::T) where {T}
     seekstart(io)
     return read(io, T)
 end
+
+#-----------------------------------------------------------------------------# Reserved
+struct Reserved{N}
+    data::NTuple{N, UInt8}
+end
+Reserved{N}() where {N} = Reserved{N}(ntuple(_ -> 0, Val(N)))
+Base.read(io::IO, ::Type{Reserved{N}}) where {N} = Reserved{N}(ntuple(_ -> read(io, UInt8), Val(N)))
+Base.write(io::IO, r::Reserved{N}) where {N} = sum(write(io, x) for x in r.data)
+
+#-----------------------------------------------------------------------------# Skip
+struct Skip{N} end
+Base.read(io::IO, ::Type{Skip{N}}) where {N} = (skip(io, N); Skip{N}())
+Base.write(io::IO, s::Skip{N}) where {N} = write(io, zeros(UInt8, N))
 
 end
