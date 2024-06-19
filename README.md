@@ -4,6 +4,8 @@
 
 ## Usage
 
+### `@iodef`
+
 The `@iodef` macro generates `Base.read` and `Base.write` methods for the struct.
 
 ```julia
@@ -63,3 +65,15 @@ write(path, myfile)
 
 myfile2 = read(path, MyFile)
 ```
+
+### Testing with `roundtrip`
+
+The `FileFormatHelper.roundtrip` is a simple function that writes a struct to a stream and reads it back in.  It's useful for testing that the `Base.read` and `Base.write` methods are working correctly.
+
+### `Reserved{N}` and `Skip{N}`
+
+
+Sometimes file formats have reserved or unused sections.  Both `Reserved` and `Skip` are used to represent these sections.  The difference is that:
+
+- For `Reserved{N}`, the underlying data is stored as a `NTuple{N, UInt8}`.
+- For `Skip{N}`, the underlying data is not stored at all.
