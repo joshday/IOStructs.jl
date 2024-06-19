@@ -1,6 +1,6 @@
-# FileFormatHelper
+# IOStructs
 
-**FileFormatHelper** is a Julia package that helps write structs which represent (part of) a file format.
+**IOStructs** is a Julia package that helps write structs which represent (part of) a file format.
 
 ## Usage
 
@@ -9,7 +9,7 @@
 The `@iodef` macro generates `Base.read` and `Base.write` methods for the struct.
 
 ```julia
-using FileFormatHelper
+using IOStructs
 
 @iodef struct Header
     magic::UInt32
@@ -68,7 +68,7 @@ myfile2 = read(path, MyFile)
 
 ### Testing with `roundtrip`
 
-The `FileFormatHelper.roundtrip` is a simple function that writes a struct to a stream and reads it back in.  It's useful for testing that the `Base.read` and `Base.write` methods are working correctly.
+The `IOStructs.roundtrip` is a simple function that writes a struct to a stream and reads it back in.  It's useful for testing that the `Base.read` and `Base.write` methods are working correctly.
 
 ### `Reserved{N}` and `Skip{N}`
 

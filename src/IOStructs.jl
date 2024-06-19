@@ -1,4 +1,4 @@
-module FileFormatHelper
+module IOStructs
 
 export @iodef, Reserved, Skip
 
@@ -64,6 +64,16 @@ macro iodef(e)
 
     esc(quote
         $e
+
+        function Base.show(io::IO, ::MIME"text/plain", x::$T)
+            print(io, $T, "(")
+            use_color = get(io, :color, false)
+            for (name, type) in zip(fieldnames($T), fieldtypes($T))
+                print(io, name)
+                printstyled(io, "::", type, color=use_color ? :light_black : :normal)
+                name == last(fieldnames($T)) ? print(io, ")") : print(io, ", ")
+            end
+        end
 
         function Base.read(io::IO, ::Type{$T})
             $(read_expr.(fields)...)
