@@ -51,8 +51,8 @@ Note that both `read_expr` and `write_expr` are evaluated in the context of the 
 
 ```julia
 @iodef struct MyFile
-    header::Header
-    messages::Vector{String} = [[readline(io) for _ in 1:header.nlines], join(messages, '\n')]
+    h::Header
+    messages::Vector{String} = [[readline(io) for _ in 1:h.nlines], join(messages, '\n')]
 end
 
 myfile = MyFile(Header(12345678, 1, Reserved{4}(), 3), ["Hello", "World", "!!!"])
