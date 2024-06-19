@@ -29,10 +29,10 @@ h == h2
 
 ### Custom Readers/Writers
 
-If you want to use a field with a type that doesn't have a defined `Base.read`/`Base.write` methods, you can provide your own.  The syntax is:
+If you want to use a field with a type that doesn't have defined `Base.read`/`Base.write` methods, you can provide your own.  The syntax is:
 
 ```
-field::Type = [read_expr, write_obj]
+field::Type = [read_expr, write_expr]
 ```
 
 where
