@@ -32,6 +32,10 @@ h == h2
 If you want to use a field with a type that doesn't have defined `Base.read`/`Base.write` methods, you can provide your own.  The syntax is:
 
 ```
+# Provide a custom reader only
+field::Type = read_expr
+
+# Provide custom reader and writer
 field::Type = [read_expr, write_expr]
 ```
 
