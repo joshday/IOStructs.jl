@@ -47,6 +47,7 @@ where
 
 Note that both `read_expr` and `write_expr` are evaluated in the context of the struct, so you can refer to other fields.  Additionally, the `read_expr` has access to the `io` object.
 
+#### Example
 
 ```julia
 @iodef struct MyFile
