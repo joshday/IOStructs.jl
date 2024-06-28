@@ -36,6 +36,7 @@ function Field(e::Expr)
         read_expr = e.args[2]
         Field(:($name::$type = [$read_expr, $name]))
 
+    # name::Type
     elseif e.head == :(::)
         name, type = e.args
         Field(:($name::$type = [Base.read(io, $type), $name]))
@@ -111,5 +112,19 @@ Base.write(io::IO, r::Reserved{N}) where {N} = sum(write(io, x) for x in r.data)
 struct Skip{N} end
 Base.read(io::IO, ::Type{Skip{N}}) where {N} = (skip(io, N); Skip{N}())
 Base.write(io::IO, s::Skip{N}) where {N} = write(io, zeros(UInt8, N))
+
+#-----------------------------------------------------------------------------# read_vec
+"""
+    read_vec(io::IO, ::Type{T}, isdone = eof))
+
+Read a `Vector{T}` from stream `io` until `isdone(io)` returns `true`.
+"""
+function read_vec(io::IO, ::Type{T}, isdone = eof) where {T}
+    out = T[]
+    while !isdone(io)
+        push!(out, read(io, T))
+    end
+    return out
+end
 
 end
