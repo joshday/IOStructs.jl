@@ -1,6 +1,6 @@
 using Test
 using IOStructs
-using IOStructs: roundtrip
+using IOStructs: test_roundtrip
 
 #-----------------------------------------------------------------------------# Test Structs
 @iodef struct T1
@@ -23,6 +23,6 @@ t3 = T3(t1, t2)
 #-----------------------------------------------------------------------------# Tests
 @testset "roundtrips" begin
     for t in [t1, t2, t3]
-        @test roundtrip(t) == t
+        @test test_roundtrip(t)
     end
 end

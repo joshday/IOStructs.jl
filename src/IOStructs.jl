@@ -95,23 +95,25 @@ end
 #-----------------------------------------------------------------------------# roundtrip
 function roundtrip(x::T) where {T}
     io = IOBuffer()
-    write(io, x)
+    Base.write(io, x)
     seekstart(io)
-    return read(io, T)
+    return Base.read(io, T)
 end
+
+test_roundtrip(x) = roundtrip(x) == x
 
 #-----------------------------------------------------------------------------# Reserved
 struct Reserved{N}
     data::NTuple{N, UInt8}
 end
 Reserved{N}() where {N} = Reserved{N}(ntuple(_ -> 0, Val(N)))
-Base.read(io::IO, ::Type{Reserved{N}}) where {N} = Reserved{N}(ntuple(_ -> read(io, UInt8), Val(N)))
-Base.write(io::IO, r::Reserved{N}) where {N} = sum(write(io, x) for x in r.data)
+Base.read(io::IO, ::Type{Reserved{N}}) where {N} = Reserved{N}(ntuple(_ -> Base.read(io, UInt8), Val(N)))
+Base.write(io::IO, r::Reserved{N}) where {N} = sum(Base.write(io, x) for x in r.data)
 
 #-----------------------------------------------------------------------------# Skip
 struct Skip{N} end
 Base.read(io::IO, ::Type{Skip{N}}) where {N} = (skip(io, N); Skip{N}())
-Base.write(io::IO, s::Skip{N}) where {N} = write(io, zeros(UInt8, N))
+Base.write(io::IO, s::Skip{N}) where {N} = Base.write(io, zeros(UInt8, N))
 
 #-----------------------------------------------------------------------------# read_vec
 """
@@ -122,7 +124,7 @@ Read a `Vector{T}` from stream `io` until `isdone(io)` returns `true`.
 function read_vec(io::IO, ::Type{T}, isdone = eof) where {T}
     out = T[]
     while !isdone(io)
-        push!(out, read(io, T))
+        push!(out, Base.read(io, T))
     end
     return out
 end
