@@ -43,8 +43,8 @@ field::Type = [read_expr, write_expr]
 
 where
 
-- `read_expr` is an expression that reads the field from an `io::IO` object.
-- `write_expr` is an object that will be written via `Base.write(io, write_expr)`.
+- `read_expr` is an expression that reads the field from an `io::IO` object.  This expression can use any field names defined before it in the struct.
+- `write_expr` is an object that will be written via `Base.write(io, write_expr)`.  This expression can use all of the field names.
 
 
 Note that both `read_expr` and `write_expr` are evaluated in the context of the struct, so you can refer to other fields.  Additionally, the `read_expr` has access to the `io` object.
