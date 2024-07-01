@@ -56,7 +56,7 @@ write_expr(f::Field) = :(n += Base.write(io, $(f.write_expr)))
 #-----------------------------------------------------------------------------# @iodef
 macro iodef(e)
     Base.remove_linenums!(e)
-    e.head == :struct || error("@iodef must be used on a struct epression.  Found $(e.head).")
+    e.head == :struct || error("@iodef must be used on a :struct expression.  Found $(e.head).")
     T = e.args[2] isa Symbol ? e.args[2] : e.args[2].args[1]
 
     fields = Field.(e.args[end].args)
@@ -100,7 +100,10 @@ function roundtrip(x::T) where {T}
     return Base.read(io, T)
 end
 
-test_roundtrip(x) = roundtrip(x) == x
+function test_roundtrip(x::T) where {T}
+    x2 = roundtrip(x)
+    all(isequal(getfield(x, f), getfield(x2, f)) for f in fieldnames(T))
+end
 
 #-----------------------------------------------------------------------------# Reserved
 struct Reserved{N}
