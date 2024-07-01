@@ -76,4 +76,4 @@ The `IOStructs.roundtrip` is a simple function that writes a struct to a stream 
 Sometimes file formats have reserved or unused sections.  Both `Reserved` and `Skip` are used to represent these sections.  The difference is that:
 
 - For `Reserved{N}`, the underlying data is stored as a `NTuple{N, UInt8}`.
-- For `Skip{N}`, the underlying data is not stored at all.
+- For `Skip{N}`, the underlying data is not stored at all.  Writing a `Skip{N}` will write `0x00` `N` times.
