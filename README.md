@@ -64,6 +64,8 @@ path = tempname()
 write(path, myfile)
 
 myfile2 = read(path, MyFile)
+
+myfile == myfile2
 ```
 
 ### Testing with `roundtrip`

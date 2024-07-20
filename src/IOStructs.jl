@@ -89,6 +89,8 @@ macro iodef(e)
             return n
         end
         Base.write(file::AbstractString, ::Type{$T}) = open(io -> Base.write(io, $T), file, "w")
+
+        Base.:(==)(a::$T, b::$T) = all(getfield(a,f) == getfield(b,f) for f in fieldnames($T))
     end)
 end
 
@@ -131,5 +133,12 @@ function read_vec(io::IO, ::Type{T}, isdone = eof) where {T}
     end
     return out
 end
+
+"""
+    read_vec(io::IO, ::Type{T}, n::Int)
+
+Read a `Vector{T}` of length `n` from stream `io`.
+"""
+read_vec(io::IO, ::Type{T}, n::Int) where {T} = [Base.read(io, T) for _ in 1:n]
 
 end
