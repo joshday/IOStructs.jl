@@ -137,7 +137,7 @@ end
 """
     read_vec(io::IO, ::Type{T}, n::Int)
 
-Read a `Vector{T}` of length `n` from stream `io`.
+Read a `Vector{T}` of `n` elements from stream `io`.
 """
 read_vec(io::IO, ::Type{T}, n::Int) where {T} = [Base.read(io, T) for _ in 1:n]
 
