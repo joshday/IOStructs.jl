@@ -1,0 +1,38 @@
+name: Dependabot auto-merge
+
+# Runs after the "CI" workflow finishes. If CI succeeded on a Dependabot pull
+# request, the PR is squash-merged automatically. A workflow_run trigger is used
+# (rather than the usual `gh pr merge --auto`) because `main` has no required
+# status checks, so native auto-merge has nothing to wait on and would error.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Merge Dependabot PR if CI passed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          pr=$(gh api "repos/$REPO/commits/$HEAD_SHA/pulls" \
+            --jq '.[] | select(.state == "open" and .user.login == "dependabot[bot]") | .number' \
+            | head -n1)
+          if [ -z "$pr" ]; then
+            echo "No open Dependabot PR found for commit $HEAD_SHA; nothing to merge."
+            exit 0
+          fi
+          echo "CI passed for Dependabot PR #$pr — squash-merging."
+          gh pr merge "$pr" --repo "$REPO" --squash --delete-branch
